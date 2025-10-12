@@ -1,9 +1,10 @@
 class ObsidianIndex < Formula
-  desc "A CLI tool for indexing Obsidian vaults"
+  desc "CLI tool for indexing Obsidian vaults"
   homepage "https://github.com/nzb3/obsidian-index"
   url "https://github.com/nzb3/obsidian-index/archive/v1.0.0.tar.gz"
-  sha256 "dce460e21304c3645424966cfac5dd2e58fe8e82286f92e0e5d447eb563f6b40"
+  sha256 "0d019aa76d7de087538fbe68efc4e3ca3fe623cdb51d2378a8f81872b9456a74"
   license "MIT"
+  head "https://github.com/nzb3/obsidian-index.git", branch: "main"
 
   depends_on "go" => :build
 
