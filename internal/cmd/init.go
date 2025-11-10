@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log/slog"
+	"os"
 	"path/filepath"
 
 	"github.com/nzb3/obsidian-index/internal/app"
@@ -27,7 +28,8 @@ deepest level (leaves) and working up to the root directory.
 
 Each directory will get an index file named after the directory containing
 markdown links to all files and subdirectories within it.`,
-	Example: `  obsidian-index init --dir /path/to/obsidian/vault
+	Example: `  obsidian-index init
+  obsidian-index init --dir /path/to/obsidian/vault
   obsidian-index init -d ~/Documents/MyVault --verbose`,
 	RunE: runInit,
 }
@@ -35,8 +37,7 @@ markdown links to all files and subdirectories within it.`,
 func init() {
 	rootCmd.AddCommand(initCmd)
 
-	initCmd.Flags().StringVarP(&vaultDir, "dir", "d", "", "path to the Obsidian vault directory (required)")
-	initCmd.MarkFlagRequired("dir")
+	initCmd.Flags().StringVarP(&vaultDir, "dir", "d", "", "path to the Obsidian vault directory (default: current directory)")
 
 	initCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose output")
 	initCmd.Flags().BoolVar(&dryRun, "dry-run", false, "show what would be done without creating files")
@@ -45,9 +46,19 @@ func init() {
 }
 
 func runInit(cmd *cobra.Command, args []string) error {
-	absPath, err := filepath.Abs(vaultDir)
+	dir := vaultDir
+	if dir == "" {
+		var err error
+		dir, err = os.Getwd()
+		if err != nil {
+			slog.Error("failed to get current working directory", "error", err)
+			return fmt.Errorf("failed to get current working directory: %w", err)
+		}
+	}
+
+	absPath, err := filepath.Abs(dir)
 	if err != nil {
-		slog.Error("failed to get absolute path", "directory", vaultDir, "error", err)
+		slog.Error("failed to get absolute path", "directory", dir, "error", err)
 		return fmt.Errorf("failed to get absolute path: %w", err)
 	}
 
